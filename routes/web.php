@@ -26,14 +26,15 @@ Route::post('/login', [UserController::class, 'login']);
 Route::get('/criarProjeto', [ProjetoController::class, 'criarProjeto']);
 Route::post('/criarProjeto', [ProjetoController::class, 'salvarProjeto']);
 Route::get('/editar/{projeto}', [ProjetoController::class, 'editarProjeto']);
-Route::get('/detalhe/{projeto}', [ProjetoController::class, 'detalheProjeto']);
+Route::get('/detalhe/{projeto}', [ProjetoController::class, 'detalheProjeto'])
+->name('detalheProjeto');
 Route::put('/editar/{projeto}', [ProjetoController::class, 'atualizarProjeto']);
 Route::delete('/deletar/{projeto}', [ProjetoController::class, 'deletarProjeto']);
 
 //TarefasController
 Route::post('/projetos/{projeto}/tarefas/criar', [TarefaController::class, 'criarTarefa']);
 Route::put('/tarefas/{tarefa}/editar', [TarefaController::class, 'editarTarefa']);
-Route::delete('/tarefas/{tarefa}/deletar', [TarefaController::class, 'deletarTarefa']);
+Route::delete('/tarefas/{tarefa}', [TarefaController::class, 'deletarTarefa']);
 Route::post('/tarefas/{tarefa}/tags/adicionar', [TarefaController::class, 'adicionarTag']);
 
 

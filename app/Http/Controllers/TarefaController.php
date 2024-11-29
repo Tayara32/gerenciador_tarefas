@@ -24,18 +24,23 @@ class TarefaController extends Controller
         return redirect()->route('detalheProjeto', ['projeto' => $projeto->id]);
                       
     }
-    public function editarTarefas(Tarefa $tarefa, Request $request){
+    public function editarTarefa(int $tarefa, Request $request){
         $dados = $request->validate([
             'nome' => 'required|string',
             'descricao' => 'nullable|string',
-            'prazo' => 'required',
             'status' => 'required|in:pendente,em andamento,concluida',
+            'prazo' => 'required',
             'tag_id' => 'nullable|exists:tags,id',
         ]);
+        
     
-        $tarefa->update($dados);
+        $task = Tarefa::findOrFail($tarefa);
+        foreach($dados as $k => $v)
+            $task->{$k} = $v;
+        
+            $task->save();
     
-        return redirect()->route('detalheProjeto', ['projeto' => $tarefa->projeto_id]);
+        return redirect()->route('detalheProjeto', ['projeto' => $task->projeto_id]);
 
        
     }
@@ -50,8 +55,11 @@ class TarefaController extends Controller
 
 
 
-    public function deletarTarefa(Tarefa $tarefa){
-       $tarefa->delete();
-       return back()->with('success', 'Tarefa deletada com sucesso!');
+    public function deletarTarefa(int $tarefa){
+       
+        $tarefa = Tarefa::findOrFail($tarefa);
+        $tarefa->delete();
+       
+        return back()->with('task_deleted_message', 'Tarefa apagada com sucesso!');
     }
 }

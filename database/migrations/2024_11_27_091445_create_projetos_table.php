@@ -34,11 +34,9 @@ return new class extends Migration
             $table->date('prazo')->nullable();
             $table->enum('status', ['pendente', 'concluida', 'em andamento'])->default('pendente');
             $table->unsignedBigInteger('tag_id')->nullable();
-            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('projeto_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('projeto_id')->references('id')->on('projetos')->onDelete('cascade');
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('set null'); 
+            $table->foreign('projeto_id')->references('id')->on('projetos');
+            $table->foreign('tag_id')->references('id')->on('tags'); 
             $table->timestamps();
         });
     }
@@ -50,8 +48,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projetos');
-        Schema::dropIfExists('tags');
         Schema::dropIfExists('tarefas');
+        Schema::dropIfExists('tags');
+        Schema::dropIfExists('projetos');
     }
 };

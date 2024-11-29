@@ -11,6 +11,12 @@
     <p>{{ $projeto->descricao }}</p>
     <a href="/">Voltar para Projetos</a>
 
+    @if (\Session::has('task_deleted_message'))
+        <div class="alert alert-success"><ul><li>{!! \Session::get('task_deleted_message') !!}</li></ul></div>
+    @endif
+
+  
+
     <h2>Tarefas</h2>
     @if($tarefas->isEmpty())
     <p>Não há tarefas para este projeto.</p>
@@ -32,9 +38,14 @@
                 <option value="em andamento" {{ $tarefa->status === 'em andamento' ? 'selected' : '' }}>Em Andamento</option>
                 <option value="concluida" {{ $tarefa->status === 'concluida' ? 'selected' : '' }}>Concluída</option>
             </select>
-            <input type="date" name="prazo" value="{{ $tarefa->prazo }}" required>
+            <input type="date" name="prazo" value="{{ $tarefa->prazo }}" >
             <button type="submit">Salvar Alterações</button>
         </form>
+       <form action="/tarefas/{{$tarefa->id}}" method="POST">
+        @csrf
+        @method('DELETE')
+            <button type="submit">Deletar</button>
+       </form>
     </div>
 @endforeach
 @endif
