@@ -9,18 +9,36 @@
 <body>
     @auth
     <!--Mostrará algo se o utilizador estiver logado-->
-    <p>Bem-vindo, {{ auth()->user()->name }}!</p>
-  
-
-
-
-    <form action="/criarProjeto" method="POST">
+    <h1>Bem-vindo, {{ auth()->user()->name }}!</h1>
+    <form action="/criarProjeto" method="GET">
         @csrf
-        <button>Novo Projeto</button>
+        <button type="submit">Novo Projeto</button>
     </form> 
+    <div style="border: 3px solid rgb(129, 126, 126); ">
+        <h2>Seus Projetos</h2>
 
+      
+        <form action="/criarProjeto" method="POST">
 
-    
+            @if($projetos->isEmpty())
+                <p>Você ainda não tem projetos. Crie um novo projeto para começar!</p>
+            @endif
+            @foreach ($projetos as $projeto)
+            <div style="background-color: rgb(197, 183, 183); padding: 10px; margin:10px;">
+                <h3>{{$projeto['nome']}} </h3>
+                {{$projeto['descricao']}}
+                <p><a href="/editar/{{$projeto->id}}">Editar</a></p>
+                <p><a href="/detalhe/{{$projeto->id}}">Detalhes</a></p>
+                <form action="/deletarProjeto/{{$projeto->id}}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button>Deletar</button>
+                </form>
+            </div>
+            @endforeach
+        </form>
+    </div>
+
     <form action="/logout" method="POST">
         @csrf
         <button>Log out</button>
