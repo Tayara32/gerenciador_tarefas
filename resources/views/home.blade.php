@@ -10,6 +10,31 @@
     @auth
     <!--Mostrará algo se o utilizador estiver logado-->
     <h1>Bem-vindo, {{ auth()->user()->name }}!</h1>
+
+    <div style="border: 3px solid rgb(129, 126, 126); padding: 20px;">
+        <h2>Dashboard</h2>
+
+        <form action="/dashboard"  method="GET">
+            @csrf
+            <!-- Número total de projetos -->
+            <p><strong>Total de Projetos:</strong> {{ $numeroProjetos ?? 0 }}</p>
+            <!-- Quantidade de tarefas por status -->
+            <h3>Tarefas por Status:</h3>
+            <ul>
+                @foreach ($tarefasPorStatus as $status => $quantidade)
+                    <li><strong>{{ ucfirst($status) }}:</strong> {{ $quantidade }} tarefa(s)</li>
+                @endforeach
+            </ul>
+            <!-- Quantidade de tarefas por tag -->
+            <h3>Tarefas por Tag:</h3>
+            <ul>
+                @foreach ($tarefasPorTags as $tag => $quantidade)
+                    <li><strong>{{ $tag }}:</strong> {{ $quantidade }} tarefa(s)</li>
+                @endforeach
+            </ul>
+        </form>
+    </div>
+    
     <form action="/criarProjeto" method="GET">
         @csrf
         <button type="submit">Novo Projeto</button>

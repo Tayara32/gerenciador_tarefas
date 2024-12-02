@@ -15,8 +15,8 @@ class Tarefa extends Model
         return $this->belongsTo(Projeto::class);
     }
 
-    public function tag()
+    public function tags()
     {
-        return $this->belongsTo(Tag::class, 'tag_id');
+        return $this->belongsToMany(Tag::class, 'tarefa_tag');
     }
 }

@@ -13,6 +13,6 @@ class Tag extends Model
 
     public function tarefas()
     {
-        return $this->hasMany(Tarefa::class, 'tag_id');
+        return $this->belongsToMany(Tarefa::class, 'tarefa_tag');
     }
 }

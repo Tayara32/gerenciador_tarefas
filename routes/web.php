@@ -23,6 +23,7 @@ Route::post('/logout', [UserController::class, 'logout']);
 Route::post('/login', [UserController::class, 'login']);
 
 //ProjetosController
+Route::get('/dashboard', [ProjetoController::class, 'dashboard']);
 Route::get('/criarProjeto', [ProjetoController::class, 'criarProjeto']);
 Route::post('/criarProjeto', [ProjetoController::class, 'salvarProjeto']);
 Route::get('/editar/{projeto}', [ProjetoController::class, 'editarProjeto']);

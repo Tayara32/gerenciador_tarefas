@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Projeto;
 use App\Models\Tarefa;
-use Illuminate\Container\Attributes\Tag;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class TarefaController extends Controller
@@ -14,6 +14,7 @@ class TarefaController extends Controller
             'nome' => 'required',
             'descricao' => 'required',
             'prazo' => 'required',
+            'status' => 'required|in:pendente,concluida,em andamento',
             'tag_id' => 'nullable|exists:tags,id',
         ]);
     
@@ -46,11 +47,25 @@ class TarefaController extends Controller
     }
     public function adicionarTag(Request $request, Tarefa $tarefa)
     {
-        $tag = Tag::firstOrCreate(['nome' => $request->input('tag_nome')]);
+        // Validar os dados recebidos
+        $request->validate([
+            'tag_nome' => 'nullable', 
+            'tags' => 'nullable', 
+            'tags.*' => 'exists:tags,id',
+        ]);
 
-        $tarefa->tags()->attach($tag);
+        // Associar tags existentes selecionadas
+        if ($request->has('tags')) {
+            $tarefa->tags()->syncWithoutDetaching($request->input('tags'));
+        }
 
-        return back()->with('success', 'Tag adicionada com sucesso!');
+        // Criar e associar uma nova tag
+        if ($request->filled('tag_nome')) {
+            $novaTag = Tag::firstOrCreate(['nome' => $request->input('tag_nome')]);
+            $tarefa->tags()->attach($novaTag);
+        }
+
+        return back()->with('success', 'Tags adicionadas com sucesso!');    
     }
 
 

@@ -24,12 +24,12 @@
         @csrf
         <input type="text" name="nome" placeholder="Título" required>
         <textarea name="descricao" placeholder="Descrição"></textarea>
-        <label for="tag">Tag:</label>
-        <select name="tag_id">
-            <option value="">Nenhuma</option>
-            @foreach ($tags as $tag)
-                <option value="{{ $tag->id }}">{{ $tag->nome }}</option>
-            @endforeach
+        <label for="status">Status:</label>
+        <select name="status">
+            <option value="">Selecione um status</option>
+            <option value="pendente">Pendente</option>
+            <option value="concluida">Concluída</option>
+            <option value="em andamento">Em andamento</option>
         </select>
         <label for="prazo">Prazo:</label>
         <input type="date" name="prazo" required>

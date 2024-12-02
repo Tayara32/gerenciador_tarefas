@@ -46,6 +46,35 @@
         @method('DELETE')
             <button type="submit">Deletar</button>
        </form>
+       <h4>Tags</h4>
+       <ul>
+           @foreach ($tarefa->tags as $tag)
+               <li>{{ $tag->nome }}</li>
+           @endforeach
+       </ul>
+
+
+       <form action="/tarefas/{{ $tarefa->id }}/tags/adicionar" method="POST">
+        @csrf
+        <label for="tags_existentes">Selecionar Tags Existentes:</label>
+        <select name="tags[]" multiple>
+            @foreach ($tags as $tag)
+                <option value="{{ $tag->id }}" 
+                    {{ $tarefa->tags->contains($tag->id) ? 'selected' : '' }}>
+                    {{ $tag->nome }}
+                </option>
+            @endforeach
+        </select>
+    
+        <label for="tag_nome">Criar Nova Tag:</label>
+        <input type="text" name="tag_nome" placeholder="Nova Tag">
+    
+        <button type="submit">Adicionar Tags</button>
+       </form>
+
+
+       
+
     </div>
 @endforeach
 @endif
