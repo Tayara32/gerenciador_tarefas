@@ -12,7 +12,7 @@ Route::get('/', function () {
     if(auth()->check()){
         $projetos = auth()->user()->usersProjetos()->latest()->get(); //perspectiva do user
     }
-    
+
     return view('home', ['projetos' => $projetos]);
    
 });
@@ -23,7 +23,7 @@ Route::post('/logout', [UserController::class, 'logout']);
 Route::post('/login', [UserController::class, 'login']);
 
 //ProjetosController
-Route::get('/dashboard', [ProjetoController::class, 'dashboard']);
+Route::get('/', [ProjetoController::class, 'dashboard'])->name('dashboard');
 Route::get('/criarProjeto', [ProjetoController::class, 'criarProjeto']);
 Route::post('/criarProjeto', [ProjetoController::class, 'salvarProjeto']);
 Route::get('/editar/{projeto}', [ProjetoController::class, 'editarProjeto']);

@@ -86,24 +86,20 @@ class ProjetoController extends Controller
         return redirect('/');
     }
 
-    public function dashboard(Projeto $projeto)
+    public function dashboard()
     {
-        if(auth()->user()->id !== $projeto['user_id']){
-            return redirect('/');
-        }
-        // Pegar os projetos do usuário autenticado
-        $projetos = auth()->user()->projetos;
-
+        $user = auth()->user();
+        $projetos = $user->usersProjetos()->get() ?? collect();
+    
         // Calcular o número total de projetos
         $numeroProjetos = $projetos->count();
-        dd($numeroProjetos);
 
         // Calcular a quantidade de tarefas por status
         $tarefasPorStatus = [];
         $tarefasPorTags = [];
 
         foreach ($projetos as $projeto) {
-            foreach ($projeto->tarefas as $tarefa) {
+            foreach ($projeto->projetoTarefas as $tarefa) {
                 // Agrupar tarefas por status
                 if (!isset($tarefasPorStatus[$tarefa->status])) {
                     $tarefasPorStatus[$tarefa->status] = 0;
@@ -119,7 +115,7 @@ class ProjetoController extends Controller
                 }
             }
         }
-
+        
         // Retornar a view com os dados do dashboard
         return view('home', [
             'projetos' => $projetos,

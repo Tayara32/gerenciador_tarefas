@@ -17,20 +17,26 @@
         <form action="/dashboard"  method="GET">
             @csrf
             <!-- Número total de projetos -->
-            <p><strong>Total de Projetos:</strong> {{ $numeroProjetos ?? 0 }}</p>
+            @isset($numeroProjetos)
+            <p><strong>Total de Projetos:</strong> {{ $numeroProjetos }}</p>
+            @endisset
             <!-- Quantidade de tarefas por status -->
             <h3>Tarefas por Status:</h3>
             <ul>
+                @isset($tarefasPorStatus)
                 @foreach ($tarefasPorStatus as $status => $quantidade)
                     <li><strong>{{ ucfirst($status) }}:</strong> {{ $quantidade }} tarefa(s)</li>
                 @endforeach
+                @endisset
             </ul>
             <!-- Quantidade de tarefas por tag -->
             <h3>Tarefas por Tag:</h3>
             <ul>
+                @isset($tarefasPorTags)
                 @foreach ($tarefasPorTags as $tag => $quantidade)
                     <li><strong>{{ $tag }}:</strong> {{ $quantidade }} tarefa(s)</li>
                 @endforeach
+                @endisset
             </ul>
         </form>
     </div>
