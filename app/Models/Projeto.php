@@ -18,4 +18,10 @@ class Projeto extends Model
     public function projetoTarefas(){
       return $this->hasMany(Tarefa::class, 'projeto_id', 'id');
      }
+     public function isOwnedBy($user)
+{
+    return $this->user_id === $user->id;
+}
+
+     
 }

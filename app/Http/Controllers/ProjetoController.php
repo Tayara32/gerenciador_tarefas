@@ -45,9 +45,10 @@ class ProjetoController extends Controller
     }
 
     public function atualizarProjeto(Projeto $projeto, Request $request){
-        if(auth()->user()->id !== $projeto['user_id']){
+        if (!$projeto->isOwnedBy(auth()->user())) {
             return redirect('/');
         }
+        
 
         $dados = $request->validate([
             'nome' => 'required',
@@ -66,12 +67,8 @@ class ProjetoController extends Controller
     
     public function detalheProjeto($id){
         
-        $projeto = Projeto::findOrFail($id);
-
-       
-        if ($projeto->user_id != auth()->id()) {
-            return redirect('/');
-        }
+        $projeto = auth()->user()->usersProjetos()->findOrFail($id);
+        
 
         $tarefas = $projeto->projetoTarefas; 
         $tags = Tag::all();
@@ -88,40 +85,55 @@ class ProjetoController extends Controller
 
     public function dashboard()
     {
+        
         $user = auth()->user();
         $projetos = $user->usersProjetos()->get() ?? collect();
     
         // Calcular o número total de projetos
         $numeroProjetos = $projetos->count();
 
-        // Calcular a quantidade de tarefas por status
-        $tarefasPorStatus = [];
-        $tarefasPorTags = [];
+        $tarefasAgrupadas = [];
 
         foreach ($projetos as $projeto) {
             foreach ($projeto->projetoTarefas as $tarefa) {
+                // Agrupar tarefas por projeto
+                if (!isset($tarefasAgrupadas[$projeto->id])) {
+                    $tarefasAgrupadas[$projeto->id] = [
+                        'projeto' => $projeto,
+                        'tarefas' => [],
+                    ];
+                }
+    
                 // Agrupar tarefas por status
-                if (!isset($tarefasPorStatus[$tarefa->status])) {
-                    $tarefasPorStatus[$tarefa->status] = 0;
+                if (!isset($tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status])) {
+                    $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status] = [];
                 }
-                $tarefasPorStatus[$tarefa->status]++;
-
-                // Agrupar tarefas por tags
+    
+               
+                $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status][] = $tarefa;
+    
+              
                 foreach ($tarefa->tags as $tag) {
-                    if (!isset($tarefasPorTags[$tag->nome])) {
-                        $tarefasPorTags[$tag->nome] = 0;
+                    if (!isset($tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['tags'][$tag->nome])) {
+                        $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['tags'][$tag->nome] = [];
                     }
-                    $tarefasPorTags[$tag->nome]++;
+                    $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['tags'][$tag->nome][] = $tarefa;
                 }
+    
+                // Agrupar tarefas por prazo
+                $prazo = $tarefa->prazo; 
+                if (!isset($tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['prazo'][$prazo])) {
+                    $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['prazo'][$prazo] = [];
+                }
+                $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['prazo'][$prazo][] = $tarefa;
             }
         }
+    
         
-        // Retornar a view com os dados do dashboard
         return view('home', [
             'projetos' => $projetos,
             'numeroProjetos' => $numeroProjetos,
-            'tarefasPorStatus' => $tarefasPorStatus,
-            'tarefasPorTags' => $tarefasPorTags,
+            'tarefasAgrupadas' => $tarefasAgrupadas,
         ]);
 
     }

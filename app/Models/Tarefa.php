@@ -9,7 +9,7 @@ class Tarefa extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'descricao', 'projeto_id', 'status', 'tag_id'];
+    protected $fillable = ['nome', 'descricao', 'prazo', 'projeto_id', 'status', 'tag_id'];
    
      public function projeto(){
         return $this->belongsTo(Projeto::class);
