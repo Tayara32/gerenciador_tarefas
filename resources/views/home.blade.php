@@ -15,48 +15,48 @@
         <h2>Dashboard</h2>
         <form action="/dashboard" method="GET">
             @csrf
-            <!-- Número total de projetos -->
+    
             @isset($numeroProjetos)
             <p><strong>Total de Projetos:</strong> {{ $numeroProjetos }}</p>
             @endisset
-
-            @foreach($tarefasAgrupadas as $projetoId => $dadosProjeto)
-                <div class="projeto">
-                    <h3>{{ $dadosProjeto['projeto']->nome }}</h3>
-                    <p>{{ $dadosProjeto['projeto']->descricao }}</p>
-                    
-                    <div class="tarefas">
-                        @foreach($dadosProjeto['tarefas'] as $status => $tarefasPorStatus)
-                            <h4>Status: {{ $status }}</h4>
-                            @foreach($tarefasPorStatus['tags'] as $tagName => $tarefasPorTag)
-                                <h5>Tag: {{ $tagName }}</h5>
-                                <ul>
-                                    @foreach($tarefasPorTag as $tarefa)
-                                        <li>
-                                            <p>Tarefa: {{ $tarefa->nome }}</p>
-                                            <p>Data de Conclusão: {{ $tarefa->prazo }}</p>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endforeach
-                            @foreach($tarefasPorStatus['prazo'] as $prazo => $tarefasPorPrazo)
-                                <h5>Prazo: {{ $prazo }}</h5>
-                                <ul>
-                                    @foreach($tarefasPorPrazo as $tarefa)
-                                        <li>
-                                            <p>Tarefa: {{ $tarefa->nome }} - Status: {{ $tarefa->status }}</p>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endforeach
+    
+            @foreach($projetosAgrupados as $projetoId => $dadosProjeto)
+            <div class="projeto">
+               
+                <h3>{{ $dadosProjeto['projeto']->projeto_nome }}</h3>
+                <p>{{ $dadosProjeto['projeto']->projeto_descricao }}</p>
+    
+                <div class="tarefas">
+                    @foreach($dadosProjeto['tarefas'] as $status => $tarefasPorStatus)
+                      
+    
+                        @foreach($tarefasPorStatus as $tagName => $tarefasPorTag)
+                            <h5>Tag: {{ $tagName }}</h5>
+                            
+                            <ul>
+                                @foreach($tarefasPorTag as $prazo => $tarefasPorPrazo)
+                                    <h6>Data de Conclusão: {{ $prazo }}</h6>
+                                    
+                                    <ul>
+                                        @foreach($tarefasPorPrazo as $tarefa)
+                                            <li>
+                                                <p><strong>Tarefa:</strong> {{ $tarefa->tarefa_nome }}</p>
+                                                <p><strong>Status:</strong> {{ ucfirst($tarefa->status_nome) }}</p> 
+                                               
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endforeach
+                            </ul>
                         @endforeach
-                    </div>
+                    @endforeach
                 </div>
+            </div>
             @endforeach
         </form>
-
-       
     </div>
+    
+    
     
     <form action="/criarProjeto" method="GET">
         @csrf

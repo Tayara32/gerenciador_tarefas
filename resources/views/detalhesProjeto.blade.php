@@ -28,7 +28,7 @@
         <p>Status: {{ $tarefa->status }}</p>
         <p>Prazo: {{ $tarefa->prazo }}</p>
         
-        <form action="/tarefas/{{ $tarefa->id }}/editar" method="POST">
+        <form action="/tarefas/{{ $tarefa->id }}" method="POST">
             @csrf
             @method('PUT')
             <input type="text" name="nome" value="{{ $tarefa->nome }}" required>

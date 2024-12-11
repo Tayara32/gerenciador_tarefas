@@ -37,11 +37,12 @@ Route::middleware(['auth'])->group(function () {
 
     //TarefasController
     Route::post('/projetos/{projeto}/tarefas/criar', [TarefaController::class, 'criarTarefa']);
-    Route::put('/tarefas/{tarefa}/editar', [TarefaController::class, 'editarTarefa']);
+    Route::put('/tarefas/{tarefa}', [TarefaController::class, 'editarTarefa']);
     Route::delete('/tarefas/{tarefa}', [TarefaController::class, 'deletarTarefa']);
     Route::post('/tarefas/{tarefa}/tags/adicionar', [TarefaController::class, 'adicionarTag']);
 
 });
+
 
 
 

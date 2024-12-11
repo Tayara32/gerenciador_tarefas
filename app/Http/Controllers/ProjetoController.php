@@ -6,6 +6,7 @@ use App\Models\Projeto;
 use App\Models\Tag;
 use App\Models\Tarefa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
 
 class ProjetoController extends Controller
 {
@@ -85,57 +86,71 @@ class ProjetoController extends Controller
 
     public function dashboard()
     {
-        
+       
         $user = auth()->user();
-        $projetos = $user->usersProjetos()->get() ?? collect();
-    
-        // Calcular o número total de projetos
-        $numeroProjetos = $projetos->count();
-
-        $tarefasAgrupadas = [];
-
-        foreach ($projetos as $projeto) {
-            foreach ($projeto->projetoTarefas as $tarefa) {
-                // Agrupar tarefas por projeto
-                if (!isset($tarefasAgrupadas[$projeto->id])) {
-                    $tarefasAgrupadas[$projeto->id] = [
-                        'projeto' => $projeto,
-                        'tarefas' => [],
-                    ];
-                }
-    
-                // Agrupar tarefas por status
-                if (!isset($tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status])) {
-                    $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status] = [];
-                }
-    
-               
-                $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status][] = $tarefa;
-    
-              
-                foreach ($tarefa->tags as $tag) {
-                    if (!isset($tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['tags'][$tag->nome])) {
-                        $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['tags'][$tag->nome] = [];
-                    }
-                    $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['tags'][$tag->nome][] = $tarefa;
-                }
-    
-                // Agrupar tarefas por prazo
-                $prazo = $tarefa->prazo; 
-                if (!isset($tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['prazo'][$prazo])) {
-                    $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['prazo'][$prazo] = [];
-                }
-                $tarefasAgrupadas[$projeto->id]['tarefas'][$tarefa->status]['prazo'][$prazo][] = $tarefa;
-            }
-        }
-    
         
-        return view('home', [
-            'projetos' => $projetos,
-            'numeroProjetos' => $numeroProjetos,
-            'tarefasAgrupadas' => $tarefasAgrupadas,
+        $query = $user->usersProjetos()->join('tarefas', 'tarefas.projeto_id', '=', 'projetos.id')
+        ->leftJoin('tarefa_tag', 'tarefa_tag.tarefa_id', '=', 'tarefas.id') 
+        ->leftJoin('tags', 'tags.id', '=', 'tarefa_tag.tag_id')
+        ->groupBy('projetos.id', 'projetos.nome', 'projetos.descricao', 'tags.nome', 'tarefas.status', 'tarefas.prazo', 'tarefas.nome')
+        ->select([
+            'projetos.id as projeto_id',
+            'projetos.nome as projeto_nome',
+            'projetos.descricao as projeto_descricao',
+            'tags.nome as tag_nome',
+            'tarefas.nome as tarefa_nome',
+            'tarefas.prazo as prazo',
+            'tarefas.status as status_nome',
+            DB::raw('COUNT(tarefas.id) as tarefas')
         ]);
+    
 
+    $resultado = $query->get();
+
+  
+    $projetosAgrupados = $resultado->groupBy('projeto_id');
+
+    $numeroProjetos = $projetosAgrupados->count();
+
+  
+    $tarefasAgrupadas = [];
+
+    foreach ($projetosAgrupados as $projetoId => $dadosProjeto) {
+        $projeto = $dadosProjeto->first(); 
+        $tarefasAgrupadas[$projetoId] = [
+            'projeto' => $projeto,
+            'tarefas' => []
+        ];
+
+       
+        foreach ($dadosProjeto as $tarefa) {
+            $statusNome = $tarefa->status_nome; 
+            $tagNome = $tarefa->tag_nome;
+            $prazo = $tarefa->prazo;
+
+            if (!isset($tarefasAgrupadas[$projetoId]['tarefas'][$statusNome])) {
+                $tarefasAgrupadas[$projetoId]['tarefas'][$statusNome] = [];
+            }
+
+            if (!isset($tarefasAgrupadas[$projetoId]['tarefas'][$statusNome][$tagNome])) {
+                $tarefasAgrupadas[$projetoId]['tarefas'][$statusNome][$tagNome] = [];
+            }
+
+            if (!isset($tarefasAgrupadas[$projetoId]['tarefas'][$statusNome][$tagNome][$prazo])) {
+                $tarefasAgrupadas[$projetoId]['tarefas'][$statusNome][$tagNome][$prazo] = [];
+            }
+            $tarefasAgrupadas[$projetoId]['tarefas'][$statusNome][$tagNome][$prazo][] = $tarefa;
+        }
+    }
+
+    return view('home', [
+        'projetosAgrupados' => $tarefasAgrupadas,
+        'numeroProjetos' => $numeroProjetos, 
+        'projetos' => $user->usersProjetos
+    ]);
+
+        
+      
     }
 }
 
